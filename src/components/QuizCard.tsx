@@ -2,6 +2,7 @@ import React from 'react'
 
 //types
 import {AnswerObject} from '../App'
+import { ButtonWrapper, Wrapper } from './Quizcard.styles'
 
 type prop = {
     question : string;
@@ -21,21 +22,25 @@ const QuizCard:React.FC<prop> = ({
     totalQuestions
 }) => (
   
-        <div>
+        <Wrapper>
             <p className='q__number'>
                 Question: {questionNr} / {totalQuestions}
             </p>
             <p dangerouslySetInnerHTML={{ __html:question }}></p>
             <div>
                 {answers.map((answer) => (
-                    <div key= {answer}>
+                    <ButtonWrapper 
+                    key= {answer}
+                    correct={userAnswer?.correctAnswer === answer}
+                    userClicked = {userAnswer?.answer === answer}
+                    >
                         <button disabled={userAnswer? true: false} value = {answer} onClick={callBack}>
                         <span dangerouslySetInnerHTML={{__html:answer}}></span>
                         </button>
-                    </div>
+                    </ButtonWrapper>
                 ))}
             </div>
-        </div>
+        </Wrapper>
 )
 
 export default QuizCard
