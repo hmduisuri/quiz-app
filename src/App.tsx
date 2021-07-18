@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Difficulty, fetchQuestions, QuestionState } from './API';
 import QuizCard from './components/QuizCard';
 import { GlobalStyle, Wrapper } from './App.styles';
@@ -11,6 +11,7 @@ export type AnswerObject = {
 }
 
 const TOTAL_QUESTIONS = 10;
+const GIVEN_MINUTES = 60;
 const App = () => {
 
   const [loading, setLoading] = useState(false);
@@ -19,7 +20,7 @@ const App = () => {
   const [userAnswers, setUserAnswers] = useState<AnswerObject[]>([]);
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(true);
-
+  const [timeLeft, setTimeLeft] = useState(GIVEN_MINUTES);
 
   console.log(questions);
 
@@ -54,8 +55,6 @@ const App = () => {
       }
 
       setUserAnswers((prev) => [...prev, answerObject]);
-
-
     }
   }
 
@@ -67,16 +66,40 @@ const App = () => {
       setGameOver(true);
     } else {
       setQuesNumber(nextQuestion);
+      startCounting()
     }
   }
+
+  const startCounting = () => {
+    // setTimeLeft(GIVEN_MINUTES);
+    const timer = timeLeft > 0 && setTimeout(()=>{
+          setTimeLeft(timeLeft - 1);
+          console.log(timeLeft -  1)
+      }, 1000);
+      return () => clearInterval();
+  }
+  // React.useEffect(() => {
+  //   timeLeft > 0 && setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+  // }, [timeLeft]);
+
+
+  // React.useEffect(() => {
+  //   timeLeft > 0 && setTimeout(()=>{
+  //       debugger;
+  //       setTimeLeft(timeLeft - 1);
+
+  //   },1000)
+  // },[timeLeft]);
 
 
   return (
     <>
-    <GlobalStyle/>
+      <GlobalStyle />
+
       <Wrapper>
-        <h1>Check brain</h1>
-     {gameOver || userAnswers.length === TOTAL_QUESTIONS ? (
+
+        <h1>Let's play</h1>
+        {gameOver || userAnswers.length === TOTAL_QUESTIONS ? (
           <button className='start' onClick={startTrivia}>Start game</button>
         ) : null}
         {!gameOver ? <p>Score: {score}</p> : null}
@@ -91,8 +114,16 @@ const App = () => {
         />)}
 
         {!gameOver && !loading && userAnswers.length === quesNumber + 1 && quesNumber !== TOTAL_QUESTIONS - 1 ? (
-          <button className='start next' onClick={nextQuestion}>Next Question</button>
+          <div>
+            <button className='start next' onClick={nextQuestion}>Next Question</button>
+          </div>
         ) : null}
+
+        {timeLeft === 0 ? null :
+          <h3>
+            {timeLeft < 10 ? `0${timeLeft}` : timeLeft}
+          </h3>
+        }
       </Wrapper>
     </>
   );
